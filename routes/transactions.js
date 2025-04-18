@@ -1,39 +1,43 @@
 const express = require("express");
-const Transaction = require("../models/Transaction");
-const User = require("../models/User");
-const auth = require("../middleware/authMiddleware");
 const router = express.Router();
+const auth = require("../middleware/auth");
+const Transaction = require("../models/Transaction");
 
-router.post("/", auth, async (req, res) => {
-  const { type, category, amount, date, comment } = req.body;
-  try {
-    const newTransaction = new Transaction({
-      userId: req.user.userId,
-      type,
-      category,
-      amount,
-      date,
-      comment
-    });
-    await newTransaction.save();
-
-    const user = await User.findById(req.user.userId);
-    user.balance += type === "income" ? amount : -amount;
-    await user.save();
-
-    res.status(201).json({ transaction: newTransaction, newBalance: user.balance });
-  } catch (err) {
-    res.status(500).json({ message: "Failed to add transaction" });
-  }
+// GET /api/transactions
+router.get("/", auth, async (req, res) => {
+  const transactions = await Transaction.find({ owner: req.user.id });
+  res.json(transactions);
 });
 
-router.get("/", auth, async (req, res) => {
-  try {
-    const transactions = await Transaction.find({ userId: req.user.userId });
-    res.json(transactions);
-  } catch (e) {
-    res.status(500).json({ message: "Failed to fetch transactions" });
-  }
+// POST /api/transactions
+router.post("/", auth, async (req, res) => {
+  const { type, category, comment, amount, date, balanceAfter } = req.body;
+
+  const transaction = await Transaction.create({
+    type,
+    category,
+    comment,
+    amount,
+    balanceAfter,
+    date,
+    owner: req.user.id,
+  });
+
+  res.status(201).json(transaction);
+});
+
+// GET /api/transactions-summary?month=04&year=2025
+router.get("/summary", auth, async (req, res) => {
+  const { month, year } = req.query;
+
+  const all = await Transaction.find({ owner: req.user.id });
+
+  const summary = all.filter((t) => {
+    const [day, mon, yr] = t.date.split(".");
+    return mon === month && yr === year;
+  });
+
+  res.json(summary); // можеш ще по категоріях згрупувати
 });
 
 module.exports = router;
