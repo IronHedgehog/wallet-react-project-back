@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const router = express.Router();
 
-router.post("/register", async (req, res) => {
+router.post("/sign-up", async (req, res) => {
   const { email, password } = req.body;
   try {
     const exist = await User.findOne({ email });
@@ -15,7 +15,10 @@ router.post("/register", async (req, res) => {
     await newUser.save();
 
     const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET);
-    res.status(201).json({ token, user: { email: newUser.email, balance: newUser.balance } });
+    res.status(201).json({
+      token,
+      user: { email: newUser.email, balance: newUser.balance },
+    });
   } catch (e) {
     res.status(500).json({ message: "Registration error" });
   }
