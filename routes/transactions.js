@@ -1,16 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middleware/auth");
+
 const Transaction = require("../models/Transaction");
+const authMiddleware = require("../middleware/authMiddleware");
 
 // GET /api/transactions
-router.get("/", auth, async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
   const transactions = await Transaction.find({ owner: req.user.id });
   res.json(transactions);
 });
 
-// POST /api/transactions
-router.post("/", auth, async (req, res) => {
+router.post("/", authMiddleware, async (req, res) => {
   const { type, category, comment, amount, date, balanceAfter } = req.body;
 
   const transaction = await Transaction.create({
@@ -26,8 +26,7 @@ router.post("/", auth, async (req, res) => {
   res.status(201).json(transaction);
 });
 
-// GET /api/transactions-summary?month=04&year=2025
-router.get("/summary", auth, async (req, res) => {
+router.get("/summary", authMiddleware, async (req, res) => {
   const { month, year } = req.query;
 
   const all = await Transaction.find({ owner: req.user.id });
@@ -37,7 +36,7 @@ router.get("/summary", auth, async (req, res) => {
     return mon === month && yr === year;
   });
 
-  res.json(summary); // можеш ще по категоріях згрупувати
+  res.json(summary);
 });
 
 module.exports = router;
