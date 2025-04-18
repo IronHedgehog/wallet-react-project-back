@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/users");
 const transactionRoutes = require("./routes/transactions");
 const cors = require("cors");
 
@@ -18,6 +19,7 @@ app.use(
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/transactions", transactionRoutes);
 
 mongoose
