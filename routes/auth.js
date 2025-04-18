@@ -25,7 +25,7 @@ router.post("/sign-up", async (req, res) => {
   }
 });
 
-router.delete("/sign-in", async (req, res) => {
+router.post("/sign-in", async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
@@ -39,7 +39,7 @@ router.delete("/sign-in", async (req, res) => {
   }
 });
 
-router.post("/sign-out", (req, res) => {
+router.delete("/sign-out", (req, res) => {
   res.status(204).send();
 });
 
