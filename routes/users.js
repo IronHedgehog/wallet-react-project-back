@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../middleware/auth");
+
 const User = require("../models/User");
+const authMiddleware = require("../middleware/authMiddleware");
 
 // GET /api/users/current
 router.get("/current", authMiddleware, async (req, res) => {
