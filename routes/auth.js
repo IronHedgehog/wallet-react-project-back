@@ -25,7 +25,7 @@ router.post("/sign-up", async (req, res) => {
   }
 });
 
-router.post("/sign-in", async (req, res) => {
+router.delete("/sign-in", async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
@@ -37,6 +37,10 @@ router.post("/sign-in", async (req, res) => {
   } catch (e) {
     res.status(500).json({ message: "Login error" });
   }
+});
+
+router.post("/sign-out", (req, res) => {
+  res.status(204).send();
 });
 
 module.exports = router;
