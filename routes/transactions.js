@@ -6,7 +6,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 // GET /api/transactions
 router.get("/", authMiddleware, async (req, res) => {
-  const transactions = await Transaction.find({ owner: req.user._id });
+  const transactions = await Transaction.find({ owner: req.user.userId });
   res.json(transactions);
 });
 
@@ -36,7 +36,7 @@ router.post("/", authMiddleware, async (req, res) => {
 router.get("/summary", authMiddleware, async (req, res) => {
   const { month, year } = req.query;
 
-  const all = await Transaction.find({ owner: req.user._id });
+  const all = await Transaction.find({ owner: req.user.userId });
 
   const summary = all.filter((t) => {
     const [day, mon, yr] = t.date.split(".");
