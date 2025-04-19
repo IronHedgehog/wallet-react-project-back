@@ -22,11 +22,11 @@ router.post("/", authMiddleware, async (req, res) => {
 
   const transaction = await Transaction.create({
     type,
-    category,
+    categoryId,
     comment,
     amount,
     balanceAfter,
-    date,
+    transactionDate,
     owner: req.user.userId,
   });
 
