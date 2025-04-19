@@ -15,7 +15,7 @@ router.post("/", authMiddleware, async (req, res) => {
 
   // Дістати попередній баланс:
   const lastTransaction = await Transaction.findOne({
-    owner: req.user._id,
+    owner: req.user.userId,
   }).sort({ date: -1 });
   const previousBalance = lastTransaction ? lastTransaction.balanceAfter : 0;
   const balanceAfter = previousBalance + amount;
@@ -27,7 +27,7 @@ router.post("/", authMiddleware, async (req, res) => {
     amount,
     balanceAfter,
     date,
-    owner: req.user._id,
+    owner: req.user.userId,
   });
 
   res.status(201).json(transaction);
