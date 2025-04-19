@@ -6,7 +6,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 // GET /api/transactions
 router.get("/", authMiddleware, async (req, res) => {
-  const transactions = await Transaction.find({ owner: req.user.id });
+  const transactions = await Transaction.find({ owner: req.user._id });
   res.json(transactions);
 });
 
@@ -15,7 +15,7 @@ router.post("/", authMiddleware, async (req, res) => {
 
   // Дістати попередній баланс:
   const lastTransaction = await Transaction.findOne({
-    owner: req.user.id,
+    owner: req.user._id,
   }).sort({ date: -1 });
   const previousBalance = lastTransaction ? lastTransaction.balanceAfter : 0;
   const balanceAfter = previousBalance + amount;
@@ -27,7 +27,7 @@ router.post("/", authMiddleware, async (req, res) => {
     amount,
     balanceAfter,
     date,
-    owner: req.user.id,
+    owner: req.user._id,
   });
 
   res.status(201).json(transaction);
@@ -36,7 +36,7 @@ router.post("/", authMiddleware, async (req, res) => {
 router.get("/summary", authMiddleware, async (req, res) => {
   const { month, year } = req.query;
 
-  const all = await Transaction.find({ owner: req.user.id });
+  const all = await Transaction.find({ owner: req.user._id });
 
   const summary = all.filter((t) => {
     const [day, mon, yr] = t.date.split(".");
