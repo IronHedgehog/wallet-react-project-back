@@ -19,6 +19,13 @@ app.use(
     credentials: true,
   })
 );
+app.use((err, req, res, next) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res
+    .status(500)
+    .json({ message: "Internal Server Error", error: err.message });
+});
+
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
