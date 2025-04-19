@@ -11,7 +11,7 @@ router.get("/", authMiddleware, async (req, res) => {
 });
 
 router.post("/", authMiddleware, async (req, res) => {
-  const { type, category, comment, amount, date } = req.body;
+  const { type, categoryId, comment, amount, transactionDate } = req.body;
 
   // Дістати попередній баланс:
   const lastTransaction = await Transaction.findOne({
