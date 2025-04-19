@@ -1,13 +1,37 @@
 const express = require("express");
 const router = express.Router();
-
+import { v4 as uuidv4 } from "uuid";
 const categories = [
-  { name: "Main expenses", type: "EXPENSE" },
-  { name: "Products", type: "EXPENSE" },
-  { name: "Car", type: "EXPENSE" },
-  { name: "Entertainment", type: "EXPENSE" },
-  { name: "Income", type: "INCOME" },
-  { name: "Other", type: "EXPENSE" },
+  {
+    id: uuidv4(),
+    name: "Main expenses",
+    type: "EXPENSE",
+  },
+  {
+    id: uuidv4(),
+    name: "Products",
+    type: "EXPENSE",
+  },
+  {
+    id: uuidv4(),
+    name: "Car",
+    type: "EXPENSE",
+  },
+  {
+    id: uuidv4(),
+    name: "Entertainment",
+    type: "EXPENSE",
+  },
+  {
+    id: uuidv4(),
+    name: "Income",
+    type: "INCOME",
+  },
+  {
+    id: uuidv4(),
+    name: "Other",
+    type: "EXPENSE",
+  },
 ];
 
 router.get("/", (req, res) => {
