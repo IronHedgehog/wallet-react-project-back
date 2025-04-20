@@ -18,7 +18,7 @@ router.post("/", authMiddleware, async (req, res) => {
   }).sort({ date: -1 });
   const previousBalance = lastTransaction ? lastTransaction.balanceAfter : 0;
   const balanceAfter = Number(previousBalance) + Number(amount);
-  await User.findByIdAndUpdate(req.user.id, { balance: balanceAfter });
+  await User.findByIdAndUpdate(req.user.userId, { balance: balanceAfter });
 
   const transaction = await Transaction.create({
     type,
