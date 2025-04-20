@@ -18,7 +18,7 @@ router.post("/", authMiddleware, async (req, res) => {
     owner: req.user.userId,
   }).sort({ date: -1 });
   const previousBalance = lastTransaction ? lastTransaction.balanceAfter : 0;
-  const balanceAfter = previousBalance + amount;
+  const balanceAfter = Number(previousBalance) + Number(amount);
 
   const transaction = await Transaction.create({
     type,
