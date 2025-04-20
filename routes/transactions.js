@@ -3,6 +3,7 @@ const router = express.Router();
 
 const Transaction = require("../models/Transaction");
 const authMiddleware = require("../middleware/authMiddleware");
+const User = require("../models/User");
 
 // GET /api/transactions
 router.get("/", authMiddleware, async (req, res) => {
@@ -18,6 +19,7 @@ router.post("/", authMiddleware, async (req, res) => {
   }).sort({ date: -1 });
   const previousBalance = lastTransaction ? lastTransaction.balanceAfter : 0;
   const balanceAfter = Number(previousBalance) + Number(amount);
+
   await User.findByIdAndUpdate(req.user.userId, { balance: balanceAfter });
 
   const transaction = await Transaction.create({
