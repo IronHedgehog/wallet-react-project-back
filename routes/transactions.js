@@ -13,12 +13,12 @@ router.get("/", authMiddleware, async (req, res) => {
 router.post("/", authMiddleware, async (req, res) => {
   const { type, categoryId, comment, amount, transactionDate } = req.body;
 
-  // Дістати попередній баланс:
   const lastTransaction = await Transaction.findOne({
     owner: req.user.userId,
   }).sort({ date: -1 });
   const previousBalance = lastTransaction ? lastTransaction.balanceAfter : 0;
   const balanceAfter = Number(previousBalance) + Number(amount);
+  await User.findByIdAndUpdate(req.user.id, { balance: balanceAfter });
 
   const transaction = await Transaction.create({
     type,
