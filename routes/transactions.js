@@ -13,9 +13,9 @@ router.get("/", authMiddleware, async (req, res) => {
 
 router.post("/", authMiddleware, async (req, res) => {
   const { type, categoryId, comment, amount, transactionDate } = req.body;
-
   const owner = req.user.userId;
 
+  // 1. Створюємо нову транзакцію (але ще не зберігаємо)
   const newTransaction = new Transaction({
     type,
     categoryId,
@@ -32,23 +32,24 @@ router.post("/", authMiddleware, async (req, res) => {
     (a, b) => new Date(a.transactionDate) - new Date(b.transactionDate)
   );
 
-  // 3. Перераховуємо balanceAfter для кожної транзакції
+  // 3. Перерахунок балансів
   let currentBalance = 0;
 
   for (const tx of allTransactions) {
-    const value = tx.type === "EXPENSE" ? -tx.amount : tx.amount;
+    const value =
+      tx.type === "EXPENSE" ? -Math.abs(tx.amount) : Math.abs(tx.amount);
     currentBalance += value;
     tx.balanceAfter = currentBalance;
   }
 
-  // 4. Зберігаємо нову транзакцію (вже з обрахованим балансом)
-  const savedTransaction = await Transaction.create(newTransaction);
+  // 4. Зберігаємо всі оновлені транзакції (включно з новою)
+  await Promise.all(allTransactions.map((tx) => tx.save())); // <-- save() замість create()
 
-  // 5. Оновлюємо баланс юзера на основі останньої транзакції
+  // 5. Оновлення балансу юзера
   const latestBalance = allTransactions.at(-1).balanceAfter;
   await User.findByIdAndUpdate(owner, { balance: latestBalance });
 
-  res.status(201).json(savedTransaction);
+  res.status(201).json(newTransaction);
 });
 
 router.get("/summary", authMiddleware, async (req, res) => {
