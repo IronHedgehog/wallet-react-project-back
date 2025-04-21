@@ -7,10 +7,13 @@ const Transaction = require("../models/Transaction");
 router.get("/transactions-summary", authMiddleware, async (req, res) => {
   try {
     const { month, year } = req.query;
-    const userId = req.user.id;
-
+    const userId = req.user.userId;
     if (!month || !year) {
-      return res.status(400).json({ message: "Missing month or year" });
+      // Якщо немає параметрів — просто повертаємо порожні дані
+      return res.json({
+        expensesSummary: [],
+        incomeSummary: [],
+      });
     }
 
     const transactions = await Transaction.find({
