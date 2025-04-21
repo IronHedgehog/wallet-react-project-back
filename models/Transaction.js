@@ -23,7 +23,7 @@ const transactionSchema = new mongoose.Schema({
     required: true,
   },
   transactionDate: {
-    type: String,
+    type: Date,
     required: true,
   },
   owner: {
