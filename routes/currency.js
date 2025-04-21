@@ -9,7 +9,6 @@ router.get("/", async (req, res) => {
     );
     res.json(response.data);
   } catch (err) {
-    console.error("Currency fetch error:", err.message);
     res.status(500).json({
       message: "Currency fetch failed",
       error: err.message,

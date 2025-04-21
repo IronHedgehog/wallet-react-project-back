@@ -109,7 +109,6 @@ router.get("/transactions-summary", authMiddleware, async (req, res) => {
       newExpenseSummary,
     });
   } catch (error) {
-    console.error("Summary error:", error.message);
     res.status(500).json({ message: "Server error" });
   }
 });
