@@ -11,8 +11,9 @@ router.get("/transactions-summary", authMiddleware, async (req, res) => {
     if (!month || !year) {
       // Якщо немає параметрів — просто повертаємо порожні дані
       return res.json({
-        expensesSummary: [],
-        incomeSummary: [],
+        categoriesSummary: [],
+        expensesSummary: 0,
+        incomeSummary: 0,
       });
     }
 
