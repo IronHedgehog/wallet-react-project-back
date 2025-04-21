@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
-
+const mongoose = require("mongoose");
 const authMiddleware = require("../middleware/authMiddleware");
 const Transaction = require("../models/Transaction");
 const { default: mongoose } = require("mongoose");
 const Category = require("../models/Category");
+const allCategories = require("../data/categories");
 
 // router.get("/transactions-summary", authMiddleware, async (req, res) => {
 //   try {
@@ -184,13 +185,6 @@ const Category = require("../models/Category");
 //     res.status(500).json({ message: "Server error", error: error.message });
 //   }
 // });
-
-const express = require("express");
-const mongoose = require("mongoose");
-
-const authMiddleware = require("../middleware/authMiddleware");
-const Transaction = require("../models/Transaction");
-const allCategories = require("../data/categories");
 
 router.get("/transactions-summary", authMiddleware, async (req, res) => {
   try {
