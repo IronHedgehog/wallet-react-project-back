@@ -51,12 +51,16 @@ router.get("/transactions-summary", authMiddleware, async (req, res) => {
     }
 
     const paddedMonth = String(month).padStart(2, "0");
+    const startDate = new Date(`${year}-${paddedMonth}-01T00:00:00.000Z`);
+    const endDate = new Date(
+      new Date(startDate).setMonth(startDate.getMonth() + 1)
+    );
 
     const transactions = await Transaction.find({
       owner: userId,
       transactionDate: {
-        $gte: new Date(`${year}-${paddedMonth}-01`),
-        $lte: new Date(`${year}-${paddedMonth}-31`),
+        $gte: startDate,
+        $lt: endDate,
       },
     });
 
