@@ -4,6 +4,7 @@ const router = express.Router();
 const authMiddleware = require("../middleware/authMiddleware");
 const Transaction = require("../models/Transaction");
 const { default: mongoose } = require("mongoose");
+const Category = require("../models/Category");
 
 // router.get("/transactions-summary", authMiddleware, async (req, res) => {
 //   try {
@@ -38,6 +39,69 @@ const { default: mongoose } = require("mongoose");
 //   }
 // });
 
+// router.get("/transactions-summary", authMiddleware, async (req, res) => {
+//   try {
+//     const { month, year } = req.query;
+//     const userId = req.user.userId;
+
+//     if (!month || !year) {
+//       return res.json({
+//         categoriesSummary: [],
+//         expenseSummary: 0,
+//         incomeSummary: 0,
+//       });
+//     }
+
+//     const paddedMonth = String(month).padStart(2, "0");
+//     const startDate = new Date(`${year}-${paddedMonth}-01T00:00:00.000Z`);
+//     const endDate = new Date(
+//       new Date(startDate).setMonth(startDate.getMonth() + 1)
+//     );
+//     console.log("USER ID:", req.user.userId);
+//     console.log(startDate);
+//     console.log(endDate);
+//     const transactions = await Transaction.find({
+//       owner: new mongoose.Types.ObjectId(userId),
+//       transactionDate: {
+//         $gte: startDate,
+//         $lt: endDate,
+//       },
+//     });
+//     console.log(transactions);
+//     const summary = {};
+//     let income = 0;
+//     let expenses = 0;
+
+//     for (const tx of transactions) {
+//       if (!summary[tx.categoryId]) {
+//         summary[tx.categoryId] = { total: 0, type: tx.type };
+//       }
+//       summary[tx.categoryId].total += tx.amount;
+
+//       if (tx.type === "INCOME") income += tx.amount;
+//       if (tx.type === "EXPENSE") expenses += tx.amount;
+//     }
+
+//     const categoriesSummary = Object.entries(summary).map(
+//       ([name, { total, type }]) => ({
+//         name,
+//         total,
+//         type,
+//       })
+//     );
+
+//     res.json({
+//       categoriesSummary,
+//       expenseSummary: expenses,
+//       incomeSummary: income,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: "Server error", error: error.message });
+//   }
+// });
+
+// якщо потрібна назва з id
+
 router.get("/transactions-summary", authMiddleware, async (req, res) => {
   try {
     const { month, year } = req.query;
@@ -56,9 +120,11 @@ router.get("/transactions-summary", authMiddleware, async (req, res) => {
     const endDate = new Date(
       new Date(startDate).setMonth(startDate.getMonth() + 1)
     );
-    console.log("USER ID:", req.user.userId);
-    console.log(startDate);
-    console.log(endDate);
+
+    console.log("USER ID:", userId);
+    console.log("Start Date:", startDate);
+    console.log("End Date:", endDate);
+
     const transactions = await Transaction.find({
       owner: new mongoose.Types.ObjectId(userId),
       transactionDate: {
@@ -66,28 +132,42 @@ router.get("/transactions-summary", authMiddleware, async (req, res) => {
         $lt: endDate,
       },
     });
-    console.log(transactions);
+
+    console.log("Found transactions:", transactions.length);
+
     const summary = {};
     let income = 0;
     let expenses = 0;
 
     for (const tx of transactions) {
-      if (!summary[tx.categoryId]) {
-        summary[tx.categoryId] = { total: 0, type: tx.type };
-      }
-      summary[tx.categoryId].total += tx.amount;
+      const categoryId = tx.categoryId;
+      const categoryType = tx.type;
+      const amount = tx.amount;
 
-      if (tx.type === "INCOME") income += tx.amount;
-      if (tx.type === "EXPENSE") expenses += tx.amount;
+      if (!summary[categoryId]) {
+        summary[categoryId] = { total: 0, type: categoryType };
+      }
+
+      summary[categoryId].total += amount;
+
+      if (categoryType === "INCOME") income += amount;
+      if (categoryType === "EXPENSE") expenses += amount;
     }
 
-    const categoriesSummary = Object.entries(summary).map(
-      ([name, { total, type }]) => ({
-        name,
-        total,
-        type,
-      })
-    );
+    // (Опціонально) Замість categoryId знайти назву
+    const categoryIds = Object.keys(summary);
+    const categories = await Category.find({
+      categoryId: { $in: categoryIds },
+    });
+
+    const categoriesSummary = categoryIds.map((id) => {
+      const matched = categories.find((cat) => cat.categoryId === id);
+      return {
+        name: matched ? matched.name : id, // якщо назву не знайдено, відправляємо id
+        total: summary[id].total,
+        type: summary[id].type,
+      };
+    });
 
     res.json({
       categoriesSummary,
@@ -95,8 +175,11 @@ router.get("/transactions-summary", authMiddleware, async (req, res) => {
       incomeSummary: income,
     });
   } catch (error) {
+    console.error("Error in /transactions-summary:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
+
+module.exports = router;
 
 module.exports = router;
