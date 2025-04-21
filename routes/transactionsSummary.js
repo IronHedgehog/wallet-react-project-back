@@ -3,6 +3,7 @@ const router = express.Router();
 
 const authMiddleware = require("../middleware/authMiddleware");
 const Transaction = require("../models/Transaction");
+const { default: mongoose } = require("mongoose");
 
 // router.get("/transactions-summary", authMiddleware, async (req, res) => {
 //   try {
