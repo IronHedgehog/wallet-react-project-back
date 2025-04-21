@@ -63,7 +63,7 @@ router.get("/transactions-summary", authMiddleware, async (req, res) => {
         $lt: endDate,
       },
     });
-
+    console.log(transactions);
     const summary = {};
     let income = 0;
     let expenses = 0;
