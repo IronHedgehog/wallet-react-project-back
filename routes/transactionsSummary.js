@@ -102,6 +102,96 @@ const Category = require("../models/Category");
 
 // якщо потрібна назва з id
 
+// router.get("/transactions-summary", authMiddleware, async (req, res) => {
+//   try {
+//     const { month, year } = req.query;
+//     const userId = req.user.userId;
+
+//     if (!month || !year) {
+//       return res.json({
+//         categoriesSummary: [],
+//         expenseSummary: 0,
+//         incomeSummary: 0,
+//       });
+//     }
+
+//     const paddedMonth = String(month).padStart(2, "0");
+//     const startDate = new Date(`${year}-${paddedMonth}-01T00:00:00.000Z`);
+//     const endDate = new Date(
+//       new Date(startDate).setMonth(startDate.getMonth() + 1)
+//     );
+
+//     console.log("USER ID:", userId);
+//     console.log("Start Date:", startDate);
+//     console.log("End Date:", endDate);
+
+//     const transactions = await Transaction.find({
+//       owner: new mongoose.Types.ObjectId(userId),
+//       transactionDate: {
+//         $gte: startDate,
+//         $lt: endDate,
+//       },
+//     });
+
+//     console.log("Found transactions:", transactions.length);
+
+//     const summary = {};
+//     let income = 0;
+//     let expenses = 0;
+
+//     for (const tx of transactions) {
+//       const categoryId = tx.categoryId;
+//       const categoryType = tx.type;
+//       const amount = tx.amount;
+
+//       if (!summary[categoryId]) {
+//         summary[categoryId] = { total: 0, type: categoryType };
+//       }
+
+//       summary[categoryId].total += amount;
+
+//       if (categoryType === "INCOME") income += amount;
+//       if (categoryType === "EXPENSE") expenses += amount;
+//     }
+
+//     // (Опціонально) Замість categoryId знайти назву
+//     const categoryIds = Object.keys(summary);
+//     const categories = await Category.find({
+//       categoryId: { $in: categoryIds },
+//     });
+
+//     const categoriesSummary = Object.entries(summary).map(
+//       ([categoryId, { total, type }]) => {
+//         const categoryData = allCategories.find((cat) => cat.id === categoryId);
+
+//         return {
+//           id: categoryId,
+//           name: categoryData?.name || "Unknown",
+//           total,
+//           type,
+//           backgroundColor: categoryData?.backgroundColor || "#CCCCCC",
+//         };
+//       }
+//     );
+
+//     res.json({
+//       categoriesSummary,
+//       expenseSummary: expenses,
+//       incomeSummary: income,
+//     });
+//   } catch (error) {
+//     console.error("Error in /transactions-summary:", error);
+//     res.status(500).json({ message: "Server error", error: error.message });
+//   }
+// });
+
+const express = require("express");
+const mongoose = require("mongoose");
+
+const authMiddleware = require("../middleware/authMiddleware");
+const Transaction = require("../models/Transaction");
+const allCategories = require("../data/categories");
+
 router.get("/transactions-summary", authMiddleware, async (req, res) => {
   try {
     const { month, year } = req.query;
@@ -154,20 +244,19 @@ router.get("/transactions-summary", authMiddleware, async (req, res) => {
       if (categoryType === "EXPENSE") expenses += amount;
     }
 
-    // (Опціонально) Замість categoryId знайти назву
-    const categoryIds = Object.keys(summary);
-    const categories = await Category.find({
-      categoryId: { $in: categoryIds },
-    });
+    const categoriesSummary = Object.entries(summary).map(
+      ([categoryId, { total, type }]) => {
+        const categoryData = allCategories.find((cat) => cat.id === categoryId);
 
-    const categoriesSummary = categoryIds.map((id) => {
-      const matched = categories.find((cat) => cat.categoryId === id);
-      return {
-        name: matched ? matched.name : id, // якщо назву не знайдено, відправляємо id
-        total: summary[id].total,
-        type: summary[id].type,
-      };
-    });
+        return {
+          id: categoryId,
+          name: categoryData?.name || "Unknown",
+          total,
+          type,
+          backgroundColor: categoryData?.backgroundColor || "#CCCCCC",
+        };
+      }
+    );
 
     res.json({
       categoriesSummary,
@@ -179,7 +268,5 @@ router.get("/transactions-summary", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
-
-module.exports = router;
 
 module.exports = router;
