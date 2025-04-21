@@ -56,8 +56,10 @@ router.get("/transactions-summary", authMiddleware, async (req, res) => {
       new Date(startDate).setMonth(startDate.getMonth() + 1)
     );
     console.log("USER ID:", req.user.userId);
+    console.log(startDate);
+    console.log(endDate);
     const transactions = await Transaction.find({
-      owner: userId,
+      owner: new mongoose.Types.ObjectId(userId),
       transactionDate: {
         $gte: startDate,
         $lt: endDate,
