@@ -3,7 +3,6 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const authMiddleware = require("../middleware/authMiddleware");
 const Transaction = require("../models/Transaction");
-const { default: mongoose } = require("mongoose");
 const Category = require("../models/Category");
 const allCategories = require("../data/categories");
 
