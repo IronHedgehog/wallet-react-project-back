@@ -55,7 +55,7 @@ router.get("/transactions-summary", authMiddleware, async (req, res) => {
     const endDate = new Date(
       new Date(startDate).setMonth(startDate.getMonth() + 1)
     );
-
+    console.log("USER ID:", req.user.userId);
     const transactions = await Transaction.find({
       owner: userId,
       transactionDate: {
