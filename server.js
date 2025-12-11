@@ -10,8 +10,6 @@ const transactionsSummaryRoutes = require("./routes/transactionsSummary");
 const categoriesRoutes = require("./routes/categories");
 const currencyRoutes = require("./routes/currency");
 
-
-// apsdpasdapsdk
 dotenv.config();
 
 const app = express();
